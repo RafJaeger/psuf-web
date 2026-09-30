@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#08232c">
   <title>PSUF Web</title>
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="src/styles.css?v=20260930-1">
+  <link rel="stylesheet" href="src/styles.css?v=20260930-3">
 </head>
 <body>
   <div class="app">
@@ -71,6 +71,12 @@
           </div>
           <p class="muted" data-i18n="onlineHint">Atualiza o banco do site usando os arquivos publicados no GitHub.</p>
         </div>
+
+        <section class="panel info-panel">
+          <div class="section-title" data-i18n="info">Informacao</div>
+          <div id="statusBox">PSUF Web</div>
+          <div id="commandFallback" class="fallback hidden"></div>
+        </section>
       </section>
 
       <section id="patchesPage" class="page">
@@ -105,16 +111,12 @@
           </div>
         </div>
       </section>
-
-      <section class="panel info-panel">
-        <div class="section-title" data-i18n="info">Informacao</div>
-        <div id="statusBox">PSUF Web</div>
-        <div id="commandFallback" class="fallback hidden"></div>
-      </section>
     </main>
   </div>
 
-  <dialog id="gameDialog">
+  <div id="miniStatus" class="mini-status hidden">PSUF Web</div>
+
+  <div id="gameDialog" class="modal hidden">
     <div class="dialog-head">
       <div>
         <h2 id="dialogTitle"></h2>
@@ -132,9 +134,9 @@
       <span data-i18n="saveOnPs3">Salvar no PS3 para reaplicar quando abrir o jogo</span>
     </label>
     <div id="patchList" class="patch-list"></div>
-  </dialog>
+  </div>
 
-  <dialog id="settingsDialog">
+  <div id="settingsDialog" class="modal hidden">
     <div class="dialog-head">
       <h2 data-i18n="settings">Configuracoes</h2>
       <button id="closeSettingsButton" class="icon-button" type="button">×</button>
@@ -144,12 +146,12 @@
       <button id="donateButton" type="button" data-i18n="supportProject">Apoiar projeto</button>
     </div>
     <div id="settingsContent" class="settings-content"></div>
-  </dialog>
+  </div>
 
   <input id="dbFileInput" type="file" accept=".psufdb,.zip" hidden>
   <input id="patchFileInput" type="file" accept=".txt,.ncl,.psufpatch,.csv" hidden>
 
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-  <script src="src/app.js?v=20260930-1"></script>
+  <script src="src/app.js?v=20260930-3"></script>
 </body>
 </html>
