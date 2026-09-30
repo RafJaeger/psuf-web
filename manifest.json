@@ -1,0 +1,15 @@
+{
+  "name": "PSUF Web",
+  "short_name": "PSUF",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#08232c",
+  "theme_color": "#08232c",
+  "icons": [
+    {
+      "src": "assets/psuf_icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

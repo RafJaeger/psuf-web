@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#08232c">
+  <title>PSUF Web</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <img src="assets/psuf_icon.png" alt="PSUF">
+        <div>
+          <strong>PSUF</strong>
+          <span data-i18n="subtitle">Patch tool web</span>
+        </div>
+      </div>
+      <div class="top-actions">
+        <select id="languageSelect" aria-label="Language">
+          <option value="pt">PT-BR</option>
+          <option value="en">English</option>
+          <option value="es">ES</option>
+        </select>
+        <button id="settingsButton" class="icon-button" type="button" title="Config">⚙</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="panel connection-panel">
+        <div class="section-title">PS3MAPI / webMAN</div>
+        <div class="ip-row">
+          <input id="ipInput" inputmode="decimal" autocomplete="off" placeholder="IP local do PS3">
+          <button id="testButton" type="button" data-i18n="testConnection">Testar conexao</button>
+        </div>
+        <label class="check-row">
+          <input id="autoConnectInput" type="checkbox">
+          <span data-i18n="autoConnect">Conectar automaticamente</span>
+        </label>
+      </section>
+
+      <nav class="tabs" aria-label="PSUF">
+        <button class="tab active" data-page="manual" type="button" data-i18n="manual">Manual</button>
+        <button class="tab" data-page="patches" type="button" data-i18n="patches">Patches</button>
+        <button class="tab" data-page="overclock" type="button" data-i18n="overclock">Overclock</button>
+      </nav>
+
+      <section id="manualPage" class="page active">
+        <div class="panel">
+          <div class="section-title" data-i18n="manualTitle">Codigos</div>
+          <p class="muted" data-i18n="manualHint">Use com o jogo aberto. Manual escreve direto na memoria via PS3MAPI.</p>
+          <textarea id="manualCodes" spellcheck="false">0x0001036C 80630538 -> 38600000</textarea>
+          <div class="button-grid">
+            <button id="importPatchButton" type="button" data-i18n="importPatch">Importar patch</button>
+            <button id="exportPatchButton" type="button" data-i18n="exportPatch">Exportar patch</button>
+          </div>
+          <label class="check-row">
+            <input id="manualSaveInput" type="checkbox">
+            <span data-i18n="saveOnPs3">Salvar no PS3 para reaplicar quando abrir o jogo</span>
+          </label>
+          <button id="applyManualButton" class="primary wide" type="button" data-i18n="applyOpenGame">Aplicar em jogo aberto</button>
+        </div>
+
+        <div class="panel">
+          <div class="section-title" data-i18n="database">Banco de patches</div>
+          <div class="button-grid">
+            <button id="importDbButton" type="button" data-i18n="importDb">Importar PSUFDB</button>
+            <button id="onlineUpdateButton" type="button" data-i18n="onlineUpdate">Atualizar online</button>
+          </div>
+          <p class="muted" data-i18n="onlineHint">Atualiza o banco do site usando os arquivos publicados no GitHub.</p>
+        </div>
+      </section>
+
+      <section id="patchesPage" class="page">
+        <div class="panel">
+          <div class="section-title" data-i18n="patchLibrary">Lista de jogos</div>
+          <input id="searchInput" class="search" placeholder="Pesquisar jogo, Title ID ou versao">
+          <div id="stats" class="muted"></div>
+          <div id="gameList" class="game-list"></div>
+        </div>
+      </section>
+
+      <section id="overclockPage" class="page">
+        <div class="panel warning">
+          <div class="section-title" data-i18n="clockTitle">webMAN / Overclock</div>
+          <p data-i18n="clockNotice">Overclock pode aumentar FPS, mas esquenta mais. Limite PSUF: GPU 750 / VRAM 850. HEN nao funciona overclock.</p>
+          <p><strong data-i18n="clockRiskShort">Use overclock por sua conta e risco.</strong></p>
+        </div>
+        <div class="panel">
+          <div class="clock-row">
+            <label>GPU Core</label>
+            <input id="gpuClock" type="number" min="50" max="750" step="50" value="500">
+            <span>MHz</span>
+          </div>
+          <div class="clock-row">
+            <label>VRAM</label>
+            <input id="vramClock" type="number" min="50" max="850" step="50" value="650">
+            <span>MHz</span>
+          </div>
+          <div class="button-grid">
+            <button id="defaultClockButton" type="button" data-i18n="defaultClock">Padrao 500/650</button>
+            <button id="applyClockButton" class="primary" type="button" data-i18n="applyClock">Aplicar clock</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel info-panel">
+        <div class="section-title" data-i18n="info">Informacao</div>
+        <div id="statusBox">PSUF Web</div>
+        <div id="commandFallback" class="fallback hidden"></div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="gameDialog">
+    <div class="dialog-head">
+      <div>
+        <h2 id="dialogTitle"></h2>
+        <p id="dialogMeta" class="muted"></p>
+      </div>
+      <button id="closeDialogButton" class="icon-button" type="button">×</button>
+    </div>
+    <div class="dialog-actions">
+      <button id="fpsPatchButton" type="button" data-i18n="fpsPatch">Patch FPS</button>
+      <button id="gfxPatchButton" type="button" data-i18n="gfxPatch">Patches graficos</button>
+      <button id="restoreButton" type="button" data-i18n="restoreDefault">Restaurar padrao</button>
+    </div>
+    <label class="check-row">
+      <input id="savePatchInput" type="checkbox">
+      <span data-i18n="saveOnPs3">Salvar no PS3 para reaplicar quando abrir o jogo</span>
+    </label>
+    <div id="patchList" class="patch-list"></div>
+  </dialog>
+
+  <dialog id="settingsDialog">
+    <div class="dialog-head">
+      <h2 data-i18n="settings">Configuracoes</h2>
+      <button id="closeSettingsButton" class="icon-button" type="button">×</button>
+    </div>
+    <div class="settings-grid">
+      <button id="helpButton" type="button" data-i18n="howToUse">Como usar?</button>
+      <button id="donateButton" type="button" data-i18n="supportProject">Apoiar projeto</button>
+    </div>
+    <div id="settingsContent" class="settings-content"></div>
+  </dialog>
+
+  <input id="dbFileInput" type="file" accept=".psufdb,.zip" hidden>
+  <input id="patchFileInput" type="file" accept=".txt,.ncl,.psufpatch,.csv" hidden>
+
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="src/app.js"></script>
+</body>
+</html>
