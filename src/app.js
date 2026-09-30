@@ -175,13 +175,36 @@ const T = {
 };
 
 const $ = (id) => document.getElementById(id);
+const replaceAllText = (value, search, replacement) => String(value).split(search).join(replacement);
 const text = (key, vars = {}) => {
   let value = (T[state.lang] && T[state.lang][key]) || T.pt[key] || key;
   for (const [name, replacement] of Object.entries(vars)) {
-    value = value.replaceAll(`{${name}}`, String(replacement));
+    value = replaceAllText(value, `{${name}}`, String(replacement));
   }
   return value;
 };
+
+function openDialog(dialog) {
+  if (dialog && typeof dialog.showModal === "function") {
+    dialog.showModal();
+    return;
+  }
+  if (dialog) {
+    dialog.setAttribute("open", "open");
+    dialog.classList.add("fallback-dialog");
+  }
+}
+
+function closeDialog(dialog) {
+  if (dialog && typeof dialog.close === "function") {
+    dialog.close();
+    return;
+  }
+  if (dialog) {
+    dialog.removeAttribute("open");
+    dialog.classList.remove("fallback-dialog");
+  }
+}
 
 function setStatus(message, links = []) {
   $("statusBox").textContent = message;
@@ -207,7 +230,7 @@ function applyTranslations() {
   document.documentElement.lang = state.lang === "pt" ? "pt-BR" : state.lang;
   $("languageSelect").value = state.lang;
   document.querySelectorAll("[data-i18n]").forEach((node) => {
-    node.textContent = text(node.dataset.i18n);
+    node.textContent = text(node.getAttribute("data-i18n"));
   });
   $("searchInput").placeholder = state.lang === "en" ? "Search game, Title ID or version" :
     state.lang === "es" ? "Buscar juego, Title ID o version" :
@@ -535,7 +558,7 @@ function openGame(game) {
   $("dialogTitle").textContent = game.title;
   $("dialogMeta").textContent = `${game.titleId} | ${game.fps.length} FPS | ${game.gfx.length} GFX`;
   $("patchList").innerHTML = "";
-  $("gameDialog").showModal();
+  openDialog($("gameDialog"));
 }
 
 function renderPatchList(kind) {
@@ -555,7 +578,7 @@ function renderPatchList(kind) {
       <h3>${escapeHtml(patch.label)}</h3>
       <div class="muted">${escapeHtml(patch.version || "*")} | ${escapeHtml(patch.status || "")} | ${escapeHtml(patch.source || "")}</div>
       <p>${escapeHtml(patch.note || "")}</p>
-      <pre>${escapeHtml(patch.payload.replaceAll(";", "\n"))}</pre>
+      <pre>${escapeHtml(replaceAllText(patch.payload, ";", "\n"))}</pre>
       <button class="primary wide" type="button">${text("applyOpenGame")}</button>`;
     card.querySelector("button").addEventListener("click", () => {
       applyCodes(parseCodes(patch.payload), patch, game, $("savePatchInput").checked);
@@ -631,7 +654,7 @@ function bindEvents() {
       document.querySelectorAll(".tab").forEach((tab) => tab.classList.remove("active"));
       document.querySelectorAll(".page").forEach((page) => page.classList.remove("active"));
       button.classList.add("active");
-      $(`${button.dataset.page}Page`).classList.add("active");
+      $(`${button.getAttribute("data-page")}Page`).classList.add("active");
     });
   });
   $("ipInput").addEventListener("change", () => localStorage.setItem("psuf.ip", cleanIp()));
@@ -643,12 +666,12 @@ function bindEvents() {
   $("importDbButton").addEventListener("click", () => $("dbFileInput").click());
   $("onlineUpdateButton").addEventListener("click", updateOnline);
   $("searchInput").addEventListener("input", renderGames);
-  $("closeDialogButton").addEventListener("click", () => $("gameDialog").close());
+  $("closeDialogButton").addEventListener("click", () => closeDialog($("gameDialog")));
   $("fpsPatchButton").addEventListener("click", () => renderPatchList("fps"));
   $("gfxPatchButton").addEventListener("click", () => renderPatchList("gfx"));
   $("restoreButton").addEventListener("click", restoreSelectedGame);
-  $("settingsButton").addEventListener("click", () => $("settingsDialog").showModal());
-  $("closeSettingsButton").addEventListener("click", () => $("settingsDialog").close());
+  $("settingsButton").addEventListener("click", () => openDialog($("settingsDialog")));
+  $("closeSettingsButton").addEventListener("click", () => closeDialog($("settingsDialog")));
   $("helpButton").addEventListener("click", showHelp);
   $("donateButton").addEventListener("click", showDonate);
   $("defaultClockButton").addEventListener("click", () => {

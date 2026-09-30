@@ -284,6 +284,13 @@ dialog {
   padding: 16px;
 }
 
+dialog.fallback-dialog {
+  position: fixed;
+  inset: 5vh auto auto 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+}
+
 dialog::backdrop {
   background: rgba(0, 0, 0, .68);
 }
