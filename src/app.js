@@ -28,7 +28,7 @@ var T = {
     patchLibrary: "Lista de jogos", clockTitle: "webMAN / Overclock",
     clockNotice: "Overclock pode aumentar FPS, mas esquenta mais. Limite PSUF: GPU 750 / VRAM 850. HEN nao funciona overclock.",
     clockRiskShort: "Use overclock por sua conta e risco.", defaultClock: "Padrao 500/650", applyClock: "Aplicar clock",
-    info: "Informacao", fpsPatch: "Patch FPS", gfxPatch: "Patches graficos", restoreDefault: "Restaurar padrao",
+    info: "Informacao", fpsPatch: "Patch FPS", gfxPatch: "Patches graficos", restoreDefault: "Restaurar padrao", localCovers: "Capas locais carregadas do repositorio.",
     settings: "Configuracoes", howToUse: "Como usar?", supportProject: "Apoiar projeto", darkMode: "Modo escuro", lightMode: "Modo claro",
     loadingDb: "Carregando banco...", dbReady: "Banco carregado: {count} jogos.", dbUpdated: "Banco atualizado online: {count} jogos.",
     noIp: "Coloque o IP local do PS3.", connectionSent: "Comando enviado.", applying: "Aplicando codigos...",
@@ -51,7 +51,7 @@ var T = {
     onlineHint: "Updates this site database using the files published on GitHub.", patchLibrary: "Game list",
     clockTitle: "webMAN / Overclock", clockNotice: "Overclock may improve FPS, but it adds heat. PSUF limit: GPU 750 / VRAM 850. HEN does not support overclock.",
     clockRiskShort: "Use overclock at your own risk.", defaultClock: "Default 500/650", applyClock: "Apply clock",
-    info: "Information", fpsPatch: "FPS patch", gfxPatch: "Graphic patches", restoreDefault: "Restore default",
+    info: "Information", fpsPatch: "FPS patch", gfxPatch: "Graphic patches", restoreDefault: "Restore default", localCovers: "Local covers loaded from the repository.",
     settings: "Settings", howToUse: "How to use?", supportProject: "Support project", darkMode: "Dark mode", lightMode: "Light mode", loadingDb: "Loading database...",
     dbReady: "Database loaded: {count} games.", dbUpdated: "Database updated online: {count} games.", noIp: "Enter the PS3 local IP.",
     connectionSent: "Command sent.", applying: "Applying codes...", applied: "Applied: {count} code(s).", saved: " Patch saved on PS3.",
@@ -73,7 +73,7 @@ var T = {
     onlineHint: "Actualiza el banco del sitio usando los archivos publicados en GitHub.", patchLibrary: "Lista de juegos",
     clockTitle: "webMAN / Overclock", clockNotice: "El overclock puede mejorar FPS, pero calienta mas. Limite PSUF: GPU 750 / VRAM 850. HEN no permite overclock.",
     clockRiskShort: "Usa overclock bajo tu propio riesgo.", defaultClock: "Predeterminado 500/650", applyClock: "Aplicar clock",
-    info: "Informacion", fpsPatch: "Patch FPS", gfxPatch: "Patches graficos", restoreDefault: "Restaurar predeterminado",
+    info: "Informacion", fpsPatch: "Patch FPS", gfxPatch: "Patches graficos", restoreDefault: "Restaurar predeterminado", localCovers: "Caratulas locales cargadas desde el repositorio.",
     settings: "Configuraciones", howToUse: "Como usar?", supportProject: "Apoyar proyecto", darkMode: "Modo oscuro", lightMode: "Modo claro", loadingDb: "Cargando banco...",
     dbReady: "Banco cargado: {count} juegos.", dbUpdated: "Banco actualizado online: {count} juegos.", noIp: "Coloca la IP local del PS3.",
     connectionSent: "Comando enviado.", applying: "Aplicando codigos...", applied: "Aplicado: {count} codigo(s).", saved: " Patch guardado en PS3.",
@@ -332,13 +332,17 @@ function renderGames() {
     shown += 1;
     var card = document.createElement("button");
     card.className = "game-card"; card.type = "button"; card.setAttribute("data-index", i);
-    card.innerHTML = '<div class="game-mark">' + escapeHtml(g.title.slice(0, 2).toUpperCase()) + '</div><div><div class="game-title">' + escapeHtml(g.title) + '</div><div class="game-meta">' + escapeHtml(g.titleId) + '</div></div><div class="pill-row"><span class="pill">' + g.fps.length + ' FPS</span><span class="pill">' + g.gfx.length + ' GFX</span></div>';
+    card.innerHTML = '<div class="game-cover"><div class="game-mark">' + escapeHtml(g.title.slice(0, 2).toUpperCase()) + '</div></div><div class="game-copy"><div class="game-title">' + escapeHtml(g.title) + '</div><div class="game-meta">' + escapeHtml(g.titleId) + '</div></div><div class="pill-row"><span class="pill">' + g.fps.length + ' FPS</span><span class="pill">' + g.gfx.length + ' GFX</span></div>';
+    var coverBox = card.getElementsByClassName("game-cover")[0], cover = document.createElement("img");
+    cover.src = "assets/covers/" + encodeURIComponent(g.titleId) + ".JPG"; cover.alt = ""; cover.loading = "lazy";
+    cover.onerror = function () { this.style.display = "none"; };
+    coverBox.insertBefore(cover, coverBox.firstChild);
     card.onclick = function () { openGame(state.games[parseInt(this.getAttribute("data-index"), 10)]); };
     list.appendChild(card);
   }
   $("stats").innerHTML = shown + " / " + state.games.length;
 }
-function openGame(game) { state.selectedGame = game; $("dialogTitle").innerHTML = escapeHtml(game.title); $("dialogMeta").innerHTML = escapeHtml(game.titleId + " | " + game.fps.length + " FPS | " + game.gfx.length + " GFX"); $("patchList").innerHTML = ""; openModal("gameDialog"); }
+function openGame(game) { state.selectedGame = game; $("dialogTitle").innerHTML = escapeHtml(game.title); $("dialogMeta").innerHTML = escapeHtml(game.titleId + " | " + game.fps.length + " FPS | " + game.gfx.length + " GFX"); var box = $("dialogCover"); box.innerHTML = '<div class="game-mark">' + escapeHtml(game.title.slice(0, 2).toUpperCase()) + '</div>'; var img = document.createElement("img"); img.src = "assets/covers/" + encodeURIComponent(game.titleId) + ".JPG"; img.alt = ""; img.onerror = function () { this.style.display = "none"; }; box.insertBefore(img, box.firstChild); $("patchList").innerHTML = ""; openModal("gameDialog"); }
 function renderPatchList(kind) {
   var game = state.selectedGame; if (!game) return;
   var patches = kind === "gfx" ? game.gfx : game.fps, list = $("patchList"); list.innerHTML = "";

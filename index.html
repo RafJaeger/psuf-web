@@ -6,13 +6,13 @@
   <meta id="themeColorMeta" name="theme-color" content="#08232c">
   <title>PSUF Web</title>
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="src/styles.css?v=20261109-v3">
+  <link rel="stylesheet" href="src/styles.css?v=20261109-v4">
 </head>
 <body>
   <div class="app">
     <header class="topbar">
       <div class="brand">
-        <img src="assets/psuf_icon.png" alt="PSUF">
+        <img src="assets/psuf_wordmark.png" alt="PSUF">
         <div>
           <strong>PSUF</strong>
           <span data-i18n="subtitle">Patch tool web</span>
@@ -88,6 +88,7 @@
           <div class="section-title" data-i18n="patchLibrary">Lista de jogos</div>
           <input id="searchInput" class="search" placeholder="Pesquisar jogo, Title ID ou versao">
           <div id="stats" class="muted"></div>
+          <p class="cover-note" data-i18n="localCovers">Capas locais carregadas do repositorio.</p>
           <div id="gameList" class="game-list"></div>
         </div>
       </section>
@@ -122,6 +123,7 @@
 
   <div id="gameDialog" class="modal hidden">
     <div class="dialog-head">
+      <div id="dialogCover" class="dialog-cover"><div class="game-mark"></div></div>
       <div>
         <h2 id="dialogTitle"></h2>
         <p id="dialogMeta" class="muted"></p>
@@ -156,6 +158,6 @@
   <input id="patchFileInput" type="file" accept=".txt,.ncl,.psufpatch,.csv" hidden>
 
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-  <script src="src/app.js?v=20261109-v3"></script>
+  <script src="src/app.js?v=20261109-v4"></script>
 </body>
 </html>
