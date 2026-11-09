@@ -29,7 +29,7 @@ var T = {
     clockNotice: "Overclock pode aumentar FPS, mas esquenta mais. Limite PSUF: GPU 750 / VRAM 850. HEN nao funciona overclock.",
     clockRiskShort: "Use overclock por sua conta e risco.", defaultClock: "Padrao 500/650", applyClock: "Aplicar clock",
     info: "Informacao", fpsPatch: "Patch FPS", gfxPatch: "Patches graficos", restoreDefault: "Restaurar padrao",
-    settings: "Configuracoes", howToUse: "Como usar?", supportProject: "Apoiar projeto",
+    settings: "Configuracoes", howToUse: "Como usar?", supportProject: "Apoiar projeto", darkMode: "Modo escuro", lightMode: "Modo claro",
     loadingDb: "Carregando banco...", dbReady: "Banco carregado: {count} jogos.", dbUpdated: "Banco atualizado online: {count} jogos.",
     noIp: "Coloque o IP local do PS3.", connectionSent: "Comando enviado.", applying: "Aplicando codigos...",
     applied: "Aplicado: {count} codigo(s).", saved: " Patch salvo no PS3.", noCodes: "Nao achei codigo valido.",
@@ -52,7 +52,7 @@ var T = {
     clockTitle: "webMAN / Overclock", clockNotice: "Overclock may improve FPS, but it adds heat. PSUF limit: GPU 750 / VRAM 850. HEN does not support overclock.",
     clockRiskShort: "Use overclock at your own risk.", defaultClock: "Default 500/650", applyClock: "Apply clock",
     info: "Information", fpsPatch: "FPS patch", gfxPatch: "Graphic patches", restoreDefault: "Restore default",
-    settings: "Settings", howToUse: "How to use?", supportProject: "Support project", loadingDb: "Loading database...",
+    settings: "Settings", howToUse: "How to use?", supportProject: "Support project", darkMode: "Dark mode", lightMode: "Light mode", loadingDb: "Loading database...",
     dbReady: "Database loaded: {count} games.", dbUpdated: "Database updated online: {count} games.", noIp: "Enter the PS3 local IP.",
     connectionSent: "Command sent.", applying: "Applying codes...", applied: "Applied: {count} code(s).", saved: " Patch saved on PS3.",
     noCodes: "No valid code found.", noPatch: "This game has no patch here.",
@@ -74,7 +74,7 @@ var T = {
     clockTitle: "webMAN / Overclock", clockNotice: "El overclock puede mejorar FPS, pero calienta mas. Limite PSUF: GPU 750 / VRAM 850. HEN no permite overclock.",
     clockRiskShort: "Usa overclock bajo tu propio riesgo.", defaultClock: "Predeterminado 500/650", applyClock: "Aplicar clock",
     info: "Informacion", fpsPatch: "Patch FPS", gfxPatch: "Patches graficos", restoreDefault: "Restaurar predeterminado",
-    settings: "Configuraciones", howToUse: "Como usar?", supportProject: "Apoyar proyecto", loadingDb: "Cargando banco...",
+    settings: "Configuraciones", howToUse: "Como usar?", supportProject: "Apoyar proyecto", darkMode: "Modo oscuro", lightMode: "Modo claro", loadingDb: "Cargando banco...",
     dbReady: "Banco cargado: {count} juegos.", dbUpdated: "Banco actualizado online: {count} juegos.", noIp: "Coloca la IP local del PS3.",
     connectionSent: "Comando enviado.", applying: "Aplicando codigos...", applied: "Aplicado: {count} codigo(s).", saved: " Patch guardado en PS3.",
     noCodes: "No encontre codigo valido.", noPatch: "Este juego no tiene patch aqui.",
@@ -133,6 +133,15 @@ function applyTranslations() {
   $("languageSelect").value = state.lang;
   each(document.querySelectorAll("[data-i18n]"), function (node) { node.innerHTML = escapeHtml(text(node.getAttribute("data-i18n"))); });
   $("searchInput").placeholder = state.lang === "en" ? "Search game, Title ID or version" : state.lang === "es" ? "Buscar juego, Title ID o version" : "Pesquisar jogo, Title ID ou versao";
+  applyTheme();
+}
+function applyTheme() {
+  var dark = localStorage.getItem("psuf.theme") === "dark";
+  if (dark) addClass(document.body, "dark-mode"); else removeClass(document.body, "dark-mode");
+  if ($("themeIcon")) $("themeIcon").innerHTML = dark ? "☀" : "☾";
+  if ($("themeLabel")) $("themeLabel").innerHTML = escapeHtml(text(dark ? "lightMode" : "darkMode"));
+  if ($("themeButton")) { $("themeButton").setAttribute("aria-pressed", dark ? "true" : "false"); $("themeButton").setAttribute("aria-label", text(dark ? "lightMode" : "darkMode")); }
+  if ($("themeColorMeta")) $("themeColorMeta").setAttribute("content", dark ? "#030507" : "#08232c");
 }
 function cleanIp() { return $("ipInput").value.replace(/^\s+|\s+$/g, "").replace(/^https?:\/\//, "").replace(/\/.*$/, ""); }
 function ps3Url(path) { var ip = cleanIp(); if (!ip) throw new Error(text("noIp")); return "http://" + ip + path; }
@@ -371,6 +380,7 @@ function setPage(page) {
 }
 function bindEvents() {
   $("languageSelect").onchange = function () { state.lang = this.value; localStorage.setItem("psuf.lang", state.lang); applyTranslations(); renderGames(); };
+  $("themeButton").onclick = function () { localStorage.setItem("psuf.theme", localStorage.getItem("psuf.theme") === "dark" ? "classic" : "dark"); applyTheme(); };
   each(document.querySelectorAll(".tab"), function (b) { b.onclick = function () { setPage(this.getAttribute("data-page")); }; });
   $("ipInput").onchange = function () { localStorage.setItem("psuf.ip", cleanIp()); };
   $("autoConnectInput").onchange = function () { localStorage.setItem("psuf.auto", $("autoConnectInput").checked ? "1" : "0"); };
@@ -387,6 +397,6 @@ function bindEvents() {
 function init() {
   bindEvents(); $("ipInput").value = localStorage.getItem("psuf.ip") || ""; $("autoConnectInput").checked = localStorage.getItem("psuf.auto") === "1";
   $("gpuClock").value = localStorage.getItem("psuf.clock.gpu") || CLOCK_DEFAULT_GPU; $("vramClock").value = localStorage.getItem("psuf.clock.vram") || CLOCK_DEFAULT_VRAM;
-  applyTranslations(); setPage("manual"); loadBundledDatabase(); if ($("autoConnectInput").checked && cleanIp()) sendCommand("/cpursx.ps3");
+  applyTranslations(); applyTheme(); setPage("manual"); loadBundledDatabase(); if ($("autoConnectInput").checked && cleanIp()) sendCommand("/cpursx.ps3");
 }
 try { init(); } catch (error) { setStatus(error.message || String(error)); }

@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#08232c">
+  <meta id="themeColorMeta" name="theme-color" content="#08232c">
   <title>PSUF Web</title>
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="src/styles.css?v=20260930-3">
+  <link rel="stylesheet" href="src/styles.css?v=20261109-v3">
 </head>
 <body>
   <div class="app">
@@ -24,6 +24,10 @@
           <option value="en">English</option>
           <option value="es">ES</option>
         </select>
+        <button id="themeButton" class="theme-button" type="button" aria-pressed="false">
+          <span id="themeIcon" aria-hidden="true">☾</span>
+          <span id="themeLabel" data-i18n="darkMode">Modo escuro</span>
+        </button>
         <button id="settingsButton" class="icon-button" type="button" title="Config">⚙</button>
       </div>
     </header>
@@ -152,6 +156,6 @@
   <input id="patchFileInput" type="file" accept=".txt,.ncl,.psufpatch,.csv" hidden>
 
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-  <script src="src/app.js?v=20260930-3"></script>
+  <script src="src/app.js?v=20261109-v3"></script>
 </body>
 </html>
